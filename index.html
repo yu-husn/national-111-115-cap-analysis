@@ -14,9 +14,9 @@
 .cutoff-subject{display:flex;flex-direction:column}
 .cutoff-subject-heading{display:flex;align-items:center;gap:18px;flex-wrap:wrap;min-height:48px;margin-bottom:10px}
 .cutoff-subject-heading h3{margin:0;white-space:nowrap}
-#englishControlSlot{margin:0;display:flex;align-items:center}
-#englishControlSlot #listeningControl{display:flex;align-items:center;gap:10px;white-space:nowrap}
-#englishControlSlot select{width:auto;min-width:88px;margin:0;padding:8px 12px}
+#englishControlSlot,#mathControlSlot{margin:0;display:flex;align-items:center}
+#englishControlSlot #listeningControl,#mathControlSlot #mathControl{display:flex;flex-direction:row;align-items:center;gap:10px;white-space:nowrap}
+#englishControlSlot select,#mathControlSlot select{width:auto;min-width:88px;margin:0;padding:8px 12px}
 .cutoff-subject>p{margin:0 0 12px}
 .cutoff-subject>.scroll{margin-top:auto}
 @media(max-width:900px){.cutoff-subject>.scroll{margin-top:0}}
@@ -80,7 +80,7 @@ function renderComparisons(){
  const ys=[111,112,113,114,115],heads=ys.map(y=>y+' 年');
  $('cutoffTitle').textContent='111–115 年｜各等級要答對幾題？';$('proportionTitle').textContent='111–115 年｜各等級人數比例';$('annualTitle').textContent='111–115 年｜各科平均通過率數值';
  $('compareCutoffs').innerHTML='<h3>111–115 年｜各等級答對題數對照表</h3><div class="cutoff-subject-grid">'+FIVE.map(s=>'<section class="cutoff-subject"><div class="cutoff-subject-heading"><h3>'+s+'</h3></div>'+(s==='英語'?'<div id="englishControlSlot" class="toolbar"></div><p id="englishReadingLabel"><strong>英文閱讀答對題數（會隨英文聽力答對題數而產生變化）</strong></p>':s==='數學'?'<div id="mathControlSlot" class="toolbar"></div><p id="mathChoiceLabel"><strong>數學選擇答對題數</strong>（會隨數學非選分數而產生變化）</p>':'')+compareTable(['等級',...heads],BANDS.map(g=>[g,...ys.map(y=>requiredRange(s,g,y))]))+'</section>').join('')+'</div>';
- $('englishControlSlot').appendChild(listenControl);$('englishControlSlot').parentElement.querySelector('.cutoff-subject-heading').appendChild($('englishControlSlot'));$('mathControlSlot').appendChild(mathControl);
+ $('englishControlSlot').appendChild(listenControl);$('englishControlSlot').parentElement.querySelector('.cutoff-subject-heading').appendChild($('englishControlSlot'));$('mathControlSlot').appendChild(mathControl);$('mathControlSlot').parentElement.querySelector('.cutoff-subject-heading').appendChild($('mathControlSlot'));
  $('compareProportions').innerHTML='<h3>五年度等級比例並列</h3>'+FIVE.map(s=>'<h3>'+s+'</h3>'+compareTable(['等級',...heads],[...BANDS.map(g=>[g,...ys.map(y=>GRADES[y].proportions[s][g])]),...[["精熟 A 合計（A++＋A+＋A）",['A++','A+','A']],["基礎 B 合計（B++＋B+＋B）",['B++','B+','B']]].map(([label,bands])=>[label,...ys.map(y=>(bands.reduce((sum,g)=>sum+Math.round(parseFloat(GRADES[y].proportions[s][g])*100),0)/100).toFixed(2)+'%')])])).join('');
  $('compareMeans').innerHTML=compareTable(['科目',...heads],NAMES.map(s=>[s,...ys.map(y=>pct(get(y,s).mean))]));
  $('compareSources').innerHTML='<h3>五年度官方來源</h3>'+compareTable(['年度','題本與統計','等級題數','等級比例'],ys.map(y=>[y+' 年',`<a href="https://cap.rcpet.edu.tw/exam/${y}/${y}exam.html" target="_blank" rel="noopener">官方資料</a>`,`<a href="${esc(GRADES[y].sources.cutoffs)}" target="_blank" rel="noopener">題數對照表</a>`,`<a href="${esc(GRADES[y].sources.levels)}" target="_blank" rel="noopener">比例統計表</a>`]));
