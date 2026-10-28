@@ -9,6 +9,17 @@
 .cutoff-subject-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
 .cutoff-subject{min-width:0}.cutoff-subject h3{margin-top:8px}.cutoff-subject table{min-width:0;width:100%;font-size:16px}.cutoff-subject th,.cutoff-subject td{padding:12px 9px;white-space:nowrap}.cutoff-subject .toolbar{margin-bottom:10px}
 @media(max-width:900px){.cutoff-subject-grid{grid-template-columns:1fr}.cutoff-subject table{font-size:15px}}
+</style><style id="aligned-cutoff-controls">
+.cutoff-subject-grid{align-items:stretch}
+.cutoff-subject{display:flex;flex-direction:column}
+.cutoff-subject-heading{display:flex;align-items:center;gap:18px;flex-wrap:wrap;min-height:48px;margin-bottom:10px}
+.cutoff-subject-heading h3{margin:0;white-space:nowrap}
+#englishControlSlot{margin:0;display:flex;align-items:center}
+#englishControlSlot #listeningControl{display:flex;align-items:center;gap:10px;white-space:nowrap}
+#englishControlSlot select{width:auto;min-width:88px;margin:0;padding:8px 12px}
+.cutoff-subject>p{margin:0 0 12px}
+.cutoff-subject>.scroll{margin-top:auto}
+@media(max-width:900px){.cutoff-subject>.scroll{margin-top:0}}
 </style></head><body><main>
 <header class="hero" id="pageTop"><div class="eyebrow">國中教育會考・全國歷年教學分析</div><h1>111–115年全國會考成績分析</h1><p class="sub">新課綱實施後：111–115 年官方等級門檻、比例、歷年走勢與逐題查看。各年題數相同，試題及考生仍不同。</p><a href="#gradeCutoffs">看等級題數門檻</a>　<a href="#gradeProportions">看等級比例</a>　<a href="#trends">看歷年折線圖</a>　<a href="#annual">看年度分析</a>　<a href="#sources">來源與核對紀錄</a><p class="note">上方折線圖與比較表一次呈現 111–115 年。下方逐題分析可選擇年度、科目及排序方式。</p></header>
 <section class="panel anchor" id="gradeCutoffs"><h2 id="cutoffTitle"></h2><p>先看各等級對應的答對題數範圍；以當年度官方對照表為準。A、B 為單一標示，並非包含 A+／A++ 或 B+／B++ 的總計。</p><div class="toolbar"><label id="listeningControl">英文聽力答對題數<select id="listeningCount"></select></label><label id="mathControl">數學非選兩題合計級分<select id="mathPoints"></select></label></div><p class="note" id="cutoffCondition"></p><div class="scroll" id="cutoffTable"></div><p id="gradeSources"></p><div id="compareCutoffs"></div><p class="small">兩個選單會改變英語與數學的題數門檻。這是官方組合表的查詢結果；不能把閱讀與聽力題數直接相加，也不能只用數學選擇題數判定等級。</p></section>
@@ -68,8 +79,8 @@ function renderComparisons(){
  const listenControl=$('listeningControl'),mathControl=$('mathControl');
  const ys=[111,112,113,114,115],heads=ys.map(y=>y+' 年');
  $('cutoffTitle').textContent='111–115 年｜各等級要答對幾題？';$('proportionTitle').textContent='111–115 年｜各等級人數比例';$('annualTitle').textContent='111–115 年｜各科平均通過率數值';
- $('compareCutoffs').innerHTML='<h3>111–115 年｜各等級答對題數對照表</h3><div class="cutoff-subject-grid">'+FIVE.map(s=>'<section class="cutoff-subject"><h3>'+s+'</h3>'+(s==='英語'?'<div id="englishControlSlot" class="toolbar"></div><p id="englishReadingLabel"><strong>英文閱讀答對題數（會隨英文聽力答對題數而產生變化）</strong></p>':s==='數學'?'<div id="mathControlSlot" class="toolbar"></div><p id="mathChoiceLabel"><strong>數學選擇答對題數</strong>（會隨數學非選分數而產生變化）</p>':'')+compareTable(['等級',...heads],BANDS.map(g=>[g,...ys.map(y=>requiredRange(s,g,y))]))+'</section>').join('')+'</div>';
- $('englishControlSlot').appendChild(listenControl);$('mathControlSlot').appendChild(mathControl);
+ $('compareCutoffs').innerHTML='<h3>111–115 年｜各等級答對題數對照表</h3><div class="cutoff-subject-grid">'+FIVE.map(s=>'<section class="cutoff-subject"><div class="cutoff-subject-heading"><h3>'+s+'</h3></div>'+(s==='英語'?'<div id="englishControlSlot" class="toolbar"></div><p id="englishReadingLabel"><strong>英文閱讀答對題數（會隨英文聽力答對題數而產生變化）</strong></p>':s==='數學'?'<div id="mathControlSlot" class="toolbar"></div><p id="mathChoiceLabel"><strong>數學選擇答對題數</strong>（會隨數學非選分數而產生變化）</p>':'')+compareTable(['等級',...heads],BANDS.map(g=>[g,...ys.map(y=>requiredRange(s,g,y))]))+'</section>').join('')+'</div>';
+ $('englishControlSlot').appendChild(listenControl);$('englishControlSlot').parentElement.querySelector('.cutoff-subject-heading').appendChild($('englishControlSlot'));$('mathControlSlot').appendChild(mathControl);
  $('compareProportions').innerHTML='<h3>五年度等級比例並列</h3>'+FIVE.map(s=>'<h3>'+s+'</h3>'+compareTable(['等級',...heads],[...BANDS.map(g=>[g,...ys.map(y=>GRADES[y].proportions[s][g])]),...[["精熟 A 合計（A++＋A+＋A）",['A++','A+','A']],["基礎 B 合計（B++＋B+＋B）",['B++','B+','B']]].map(([label,bands])=>[label,...ys.map(y=>(bands.reduce((sum,g)=>sum+Math.round(parseFloat(GRADES[y].proportions[s][g])*100),0)/100).toFixed(2)+'%')])])).join('');
  $('compareMeans').innerHTML=compareTable(['科目',...heads],NAMES.map(s=>[s,...ys.map(y=>pct(get(y,s).mean))]));
  $('compareSources').innerHTML='<h3>五年度官方來源</h3>'+compareTable(['年度','題本與統計','等級題數','等級比例'],ys.map(y=>[y+' 年',`<a href="https://cap.rcpet.edu.tw/exam/${y}/${y}exam.html" target="_blank" rel="noopener">官方資料</a>`,`<a href="${esc(GRADES[y].sources.cutoffs)}" target="_blank" rel="noopener">題數對照表</a>`,`<a href="${esc(GRADES[y].sources.levels)}" target="_blank" rel="noopener">比例統計表</a>`]));
